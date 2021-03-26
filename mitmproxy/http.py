@@ -552,6 +552,9 @@ class Request(Message):
             timestamp_end=timestamp_end,
         )
 
+    def deserialize_grpc(self, path, data):
+        pass
+
     def __repr__(self) -> str:
         if self.host and self.port:
             hostport = f"{self.host}:{self.port}"

@@ -22,7 +22,7 @@ from mitmproxy import optmanager
 from mitmproxy import version
 from mitmproxy import ctx
 from mitmproxy.utils.strutils import always_str
-from mitmproxy.addons.export import curl_command
+from mitmproxy.addons.export import curl_command, grpcurl_command
 
 
 def flow_to_json(flow: mitmproxy.flow.Flow) -> dict:
@@ -376,7 +376,10 @@ class RevertFlow(RequestHandler):
 
 class CopyFlowAsCurl(RequestHandler):
     def get(self, flow_id):
-        curl_text = curl_command(self.flow, preserve_ip=ctx.options.export_preserve_original_ip)
+        if self.flow.request.headers.get('content-type') == 'application/grpc':
+            curl_text = grpcurl_command(self.flow)
+        else:
+            curl_text = curl_command(self.flow, preserve_ip=ctx.options.export_preserve_original_ip)
         resp_body = {'curl': curl_text}
         self.write(resp_body)
 

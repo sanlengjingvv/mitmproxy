@@ -83,6 +83,28 @@ def curl_command(f: flow.Flow, preserve_ip: bool = False) -> str:
     return ' '.join(shlex.quote(arg) for arg in args)
 
 
+def grpcurl_command(f: flow.Flow) -> str:
+    request = cleanup_request(f)
+    begin = "grpcurl -import-path $bapi_absolute_path -import-path $bapi_absolute_path/third_party "
+    args = []
+
+    headers = request.headers
+    deserialized_content, protobuf_module = request.deserialize_grpc(request.path, request.raw_content)
+    proto = protobuf_module.__name__.replace('bapis_python.', '').replace('.', '/').replace('_pb2', '.proto')
+    args += ["-proto", f"{proto}"]
+
+    args += ["-H", f"x-bili-device-bin:{headers['x-bili-device-bin']}"]
+    if headers.get('authorization') is not None:
+        args += ["-H", f"authorization:{headers['authorization']}"]
+
+    args += ["-d", deserialized_content]
+
+    args.append(f"{request.host}:{request.port}")
+    args.append(request.path[1:])
+
+    return begin + ' '.join(shlex.quote(arg) for arg in args)
+
+
 def httpie_command(f: flow.Flow) -> str:
     request = cleanup_request(f)
     request = pop_headers(request)
