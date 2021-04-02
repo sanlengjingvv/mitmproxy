@@ -69,12 +69,12 @@ function responseCode(code){
     responseCodeFilter.desc = "resp. code is " + code;
     return responseCodeFilter;
 }
-function body(regex){
-    regex = new RegExp(regex, "i");
+function body(flow_id){
     function bodyFilter(flow){
-        return true;
+        const res = flow_id.split(',').includes(flow.id);
+        return res;
     }
-    bodyFilter.desc = "body filters are not implemented yet, see https://github.com/mitmproxy/mitmweb/issues/10";
+    bodyFilter.desc = "body matches";
     return bodyFilter;
 }
 function requestBody(regex){

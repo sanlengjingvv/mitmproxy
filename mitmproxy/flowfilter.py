@@ -451,8 +451,6 @@ filter_unary: Sequence[Type[_Action]] = [
 ]
 filter_rex: Sequence[Type[_Rex]] = [
     FBod,
-    FBodRequest,
-    FBodResponse,
     FContentType,
     FContentTypeRequest,
     FContentTypeResponse,
