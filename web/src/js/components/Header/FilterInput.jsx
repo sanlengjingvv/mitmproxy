@@ -57,8 +57,9 @@ export default class FilterInput extends Component {
         this.setState({ value })
 
         // Only propagate valid filters upwards.
-        if (this.isValid(value)) {
-            this.props.onChange(value)
+        if (this.isValid(value) && !value.startsWith('~b')) {
+            console.log('!value.startsWith()')
+            this.props.onChange(value)            
         }
     }
 
@@ -79,10 +80,22 @@ export default class FilterInput extends Component {
     }
 
     onKeyDown(e) {
-        if (e.keyCode === Key.ESC || e.keyCode === Key.ENTER) {
+        if (e.keyCode === Key.ESC) {
             this.blur()
             // If closed using ESC/ENTER, hide the tooltip.
             this.setState({mousefocus: false})
+        }
+        if (e.keyCode === Key.ENTER) {
+            const body_match = this.state.value.split(/~b (.*)/)[1]
+            fetch(`/filter_body?match=${body_match}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                const value = `~b ${data.view_ids}`
+                if (this.isValid(value)) {
+                    this.props.onChange(value)
+                }
+            })
         }
         e.stopPropagation()
     }

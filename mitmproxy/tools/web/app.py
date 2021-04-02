@@ -6,6 +6,7 @@ import os.path
 import re
 from io import BytesIO
 from typing import ClassVar, Optional
+import gzip
 
 import tornado.escape
 import tornado.web
@@ -270,6 +271,34 @@ class ClearAll(RequestHandler):
     def post(self):
         self.view.clear()
         self.master.events.clear()
+
+
+class filterBody(RequestHandler):
+    def get(self):
+        match = self.get_arguments('match')
+        if len(match) == 0:
+            return None
+        view_ids = []
+        for f in self.view:
+            try:
+                if f.request.headers.get('content-type') == 'application/grpc':
+                    req_deserialized_content, req_protobuf_module = f.request.deserialize_grpc(f.request.path, f.request.raw_content)
+                    resp_deserialized_content, resp_protobuf_module = f.response.deserialize_grpc(f.request.path, f.response.raw_content)
+                    if match[0] in req_deserialized_content or match[0] in resp_deserialized_content:
+                        view_ids.append(f.id)
+                    continue
+                elif 'pbmobile' in f.request.path:
+                    cooked_recordio = f.request.deserialize_recordio(gzip.decompress(f.request.raw_content), 0, [])
+                    str_cooked_recordio = json.dumps(cooked_recordio)
+                    if match[0] in str_cooked_recordio:
+                        view_ids.append(f.id)
+                    continue
+                elif (f.request and match[0] in f.request.text) or (f.response and match[0] in f.response.text):
+                    view_ids.append(f.id)
+            except Exception as e:
+                continue
+
+        self.write({'view_ids': view_ids})
 
 
 class ResumeFlows(RequestHandler):
@@ -540,6 +569,7 @@ class Application(tornado.web.Application):
                     FlowContentView),
                 (r"/settings(?:\.json)?", Settings),
                 (r"/clear", ClearAll),
+                (r"/filter_body?", filterBody),
                 (r"/options(?:\.json)?", Options),
                 (r"/options/save", SaveOptions)
             ]
