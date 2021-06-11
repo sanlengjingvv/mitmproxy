@@ -33,6 +33,10 @@ def flowdetails(state, flow: mitmproxy.flow.Flow):
         req = None
         resp = None
     metadata = flow.metadata
+    comment = flow.comment
+
+    if comment:
+        text.append(urwid.Text([("head", "Comment: "), ("text", comment)]))
 
     if metadata is not None and len(metadata) > 0:
         parts = [(str(k), repr(v)) for k, v in metadata.items()]
@@ -60,7 +64,7 @@ def flowdetails(state, flow: mitmproxy.flow.Flow):
             text.append(urwid.Text([("head", "Server Certificate:")]))
             parts = [
                 ("Type", "%s, %s bits" % c.keyinfo),
-                ("SHA256 digest", c.fingerprint().hex()),
+                ("SHA256 digest", c.fingerprint().hex(' ')),
                 ("Valid to", str(c.notafter)),
                 ("Valid from", str(c.notbefore)),
                 ("Serial", str(c.serial)),

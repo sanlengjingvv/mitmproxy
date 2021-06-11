@@ -58,6 +58,16 @@ If you depend on these features, please raise your voice in
 * Add option `export_preserve_original_ip` to force exported command to connect to IP from original request. Only supports curl at the moment. (@dkasak)
 * Major proxy protocol testing (@r00t-)
 * Switch Docker image release to be based on Debian (@PeterDaveHello)
+* Multiple Browsers: The `browser.start` command may be executed more than once to start additional
+  browser sessions. (@rbdixon)
+* Improve readability of SHA256 fingerprint. (@wrekone)
+* Metadata and Replay Flow Filters: Flows may be filtered based on metadata and replay status. (@rbdixon)
+* Flow control: don't read connection data faster than it can be forwarded. (@hazcod)
+* Fix parsing of certificate issuer/subject with escaped special characters (@Prinzhorn)
+* Customize markers with emoji, and filters: The `flow.mark` command may be used to mark a flow with either the default
+  "red ball" marker, a single character, or an emoji like `:grapes:`. Use the `~marker` filter to filter on marker characters. (@rbdixon)
+* New `flow.comment` command to add a comment to the flow. Add `~comment <regex>` filter syntax to search flow comments. (@rbdixon)
+* Fix multipart forms losing `boundary` values on edit (@roytu)
 * --- TODO: add new PRs above this line ---
 * ... and various other fixes, documentation improvements, dependency version bumps, etc.
 
@@ -187,7 +197,7 @@ If you depend on these features, please raise your voice in
 
 ### Full Changelog
 
-* Moved to Github CI for Continuous Integration, dropping support for old Linux and macOS releases. (#3728)
+* Moved to GitHub CI for Continuous Integration, dropping support for old Linux and macOS releases. (#3728)
 * Vastly improved command parsing, in particular for setting flow filters (@typoon)
 * Added a new flow export for raw responses (@mckeimic)
 * URLs are now edited in an external editor (@Jessonsotoventura)
